@@ -67,11 +67,10 @@ const registrarUsuario = async (req, res,next) => {
     const {email, password} = req.body;
     //const imagen = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
     console.log({email, password})
-    // let hashPassword = await bcryptjs.hash(password, 10);
+    let hashPassword = await bcryptjs.hash(password, 10);
     const admin = false;
     const deleted = false;
     try{
-<<<<<<< HEAD
         await pool
             .query('SELECT * FROM usuario where email = $1', [correoelectronico])
             .then(results =>{
@@ -86,23 +85,6 @@ const registrarUsuario = async (req, res,next) => {
                 }
             })
             .catch(err => res.status(401).json({Error: err.message}))
-=======
-        // await pool
-        //     .query('SELECT * FROM usuarios where email = $1', [email])
-        //     .then(results =>{
-        //         if(results.rows.length > 0) {
-        //             res.status(401).send('El mail ingresado ya se encuentra en uso');
-        //         }else {
-        //             pool
-        //                 .query(`INSERT INTO usuarios (email, password,fotoperfil,isadmin)
-        //                 VALUES ($1, $2, $3,$4,$5)`, [email, hashPassword,imagen,admin])
-        //                 .then(results => res.status(200).send({res:'Usuario registrado correctamente'}))
-        //                 .catch(err => res.status(401).json({Error: err.message}))
-        //         }
-        //     })
-        //     .catch(err => res.status(401).json({Error: err.message}))
-        res.status(200).send({res:'Backend dice que el usuario se registro correctamente :D (Testing)'});
->>>>>>> origin/register
     }
     catch(e){
         next(e)
