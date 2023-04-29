@@ -26,6 +26,7 @@ const getRecipesByUserId =(req,res,next) => {
 }
 
 const crearNuevaReceta = async (req,res,next) => {
+    res.status(201).json({res:req.body});
     const {
         nombrereceta,
         descripcionreceta,

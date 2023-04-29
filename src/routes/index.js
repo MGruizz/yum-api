@@ -19,6 +19,7 @@ router.put('/editusuario/',userExtractor,editarPerfil)
 //Ruta Receta
 router.get('/recetas/',getAllRecipes);
 router.get('/recetas/:id',getRecipesByUserId);
+router.post('/recetas/' ,crearNuevaReceta)
 router.post('/recetas/',userExtractor ,crearNuevaReceta)
 router.delete('/eliminarreceta/:id',userExtractor ,eliminarReceta)
 router.put('/editreceta/',userExtractor ,editarReceta)

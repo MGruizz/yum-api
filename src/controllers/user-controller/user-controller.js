@@ -67,16 +67,17 @@ const registrarUsuario = async (req, res,next) => {
     console.log({nombrepersona, correoelectronico, password})
     let hashPassword = await bcryptjs.hash(password, 10);
     const admin = false;
+    const deleted = false;
     try{
         await pool
-            .query('SELECT * FROM usuarios where correoelectronico = $1', [correoelectronico])
+            .query('SELECT * FROM usuario where email = $1', [correoelectronico])
             .then(results =>{
                 if(results.rows.length > 0) {
                     res.status(401).send('El mail ingresado ya se encuentra en uso');
                 }else {
                     pool
-                        .query(`INSERT INTO usuarios (nombrepersona, correoelectronico, password,fotoperfil,isadmin)
-                        VALUES ($1, $2, $3,$4,$5)`, [nombrepersona, correoelectronico, hashPassword,imagen,admin])
+                        .query(`INSERT INTO usuario (username, email, password,foto_perfil)
+                        VALUES ($1, $2, $3,$4)`, [nombrepersona, correoelectronico, hashPassword,imagen])
                         .then(results => res.status(200).send({res:'Usuario registrado correctamente'}))
                         .catch(err => res.status(401).json({Error: err.message}))
                 }
