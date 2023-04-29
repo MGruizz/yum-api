@@ -25,8 +25,8 @@ const getUsersById = (req,res,next) => {
 }
 
 const logearUsuario = async (req, res,next) => {
-    const {correoElectronico, password} = req.body;
-    console.log(correoElectronico, password);
+    const {email, password} = req.body;
+    console.log(email, password);
     try{
         await pool
             .query('SELECT * FROM usuarios where correoelectronico = $1', [correoElectronico])
@@ -60,6 +60,8 @@ const logearUsuario = async (req, res,next) => {
         next(e);
     }
 }
+
+
 
 const registrarUsuario = async (req, res,next) => {
     const {nombrepersona, correoelectronico, password} = req.body;
@@ -113,4 +115,5 @@ module.exports = {
     logearUsuario,
     registrarUsuario,
     editarPerfil,
+
 }
