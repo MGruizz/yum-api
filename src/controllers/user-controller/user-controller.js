@@ -64,7 +64,7 @@ const logearUsuario = async (req, res,next) => {
 
 
 const registrarUsuario = async (req, res,next) => {
-    const {email, password} = req.body;
+    const {nickname,email, password} = req.body;
     //const imagen = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
     console.log({email, password})
     let hashPassword = await bcryptjs.hash(password, 10);
@@ -79,7 +79,7 @@ const registrarUsuario = async (req, res,next) => {
                 }else {
                     pool
                         .query(`INSERT INTO usuario (username, email, password,foto_perfil)
-                        VALUES ($1, $2, $3,$4)`, [nombrepersona, correoelectronico, hashPassword,imagen])
+                        VALUES ($1, $2, $3,$4)`, [nickname, email, hashPassword,imagen])
                         .then(results => res.status(200).send({res:'Usuario registrado correctamente'}))
                         .catch(err => res.status(401).json({Error: err.message}))
                 }
