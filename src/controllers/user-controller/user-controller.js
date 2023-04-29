@@ -65,14 +65,14 @@ const logearUsuario = async (req, res,next) => {
 
 const registrarUsuario = async (req, res,next) => {
     const {nickname,email, password} = req.body;
-    //const imagen = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
+    const imagen = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
     console.log({email, password})
     let hashPassword = await bcryptjs.hash(password, 10);
     const admin = false;
     const deleted = false;
     try{
         await pool
-            .query('SELECT * FROM usuario where email = $1', [correoelectronico])
+            .query('SELECT * FROM usuario where email = $1', [email])
             .then(results =>{
                 if(results.rows.length > 0) {
                     res.status(401).send('El mail ingresado ya se encuentra en uso');
@@ -87,6 +87,7 @@ const registrarUsuario = async (req, res,next) => {
             .catch(err => res.status(401).json({Error: err.message}))
     }
     catch(e){
+        console.log(e)
         next(e)
     }
 }
