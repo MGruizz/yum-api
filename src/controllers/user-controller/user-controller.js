@@ -9,7 +9,7 @@ const getUsersById = (req,res,next) => {
     const id = req.params.id;
     try{
         pool
-            .query(`SELECT * FROM usuarios where idusuario = ${id}`)
+            .query(`SELECT * FROM usuarios where id = ${id}`)
             .then(response=> {
                 if(response.rows.length == 0){
                     res.status(401).json({Error:'Id no existe'});
@@ -20,6 +20,7 @@ const getUsersById = (req,res,next) => {
             })
             .catch(err=> res.status(401).json({Error: err.message}))
     }catch(e){
+        console.log(e);
         next(e)
     }
 }
@@ -29,13 +30,13 @@ const logearUsuario = async (req, res,next) => {
     console.log(email, password);
     try{
         await pool
-            .query('SELECT * FROM usuarios where correoelectronico = $1', [correoElectronico])
+            .query('SELECT * FROM usuarios where email = $1', [email])
             .then(results => {
                 if(results.rows.length > 0) {
                     const user = results.rows[0];
                     const userToken = {
                         idusuario:user.idusuario,
-                        correoelectronico:user.correoelectronico,
+                        email:user.email,
                     }
                      bcryptjs.compare(password, user.password, (err, isMatch) => {
                         if(err) {
