@@ -234,11 +234,44 @@ const buscarReceta = async (req, res) => {
   }
 }
 
+const getPopularRecipes = async (req, res) => {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+
+  try {
+    const popularRecipesResult = await pool.query(
+      `SELECT id, nombre, descripcion, visitas, likes 
+      FROM recetas 
+      WHERE EXTRACT(MONTH FROM created_at) = $1 AND EXTRACT(YEAR FROM created_at) = $2 
+      ORDER BY visitas DESC LIMIT 3`,
+      [currentMonth, currentYear]
+    );
+
+    let popularRecipes = popularRecipesResult.rows;
+
+    if (popularRecipes.length < 3) {
+      const allTimePopularRecipesResult = await pool.query(
+        `SELECT id, nombre, descripcion, visitas, likes 
+        FROM recetas 
+        WHERE id NOT IN (${popularRecipes.map(r => r.id).join(', ')})
+        ORDER BY visitas DESC LIMIT ${3 - popularRecipes.length}`
+      );
+
+      popularRecipes = [...popularRecipes, ...allTimePopularRecipesResult.rows];
+    }
+    res.status(200).json({ popularRecipes });
+  } catch (err) {
+    res.status(500).json({ message: 'Error al obtener las recetas populares' });
+  }
+};
+
 module.exports = {
   getAllRecipes,
   getRecipesByUserId,
   crearNuevaReceta,
   eliminarReceta,
   editarReceta,
-  buscarReceta
+  buscarReceta,
+  getPopularRecipes
 }
