@@ -34,6 +34,8 @@ const crearNuevaReceta = async (req, res, next) => {
     
     tags,
   } = req.body;
+  console.log(req.body)
+  return;
   const categorias = ['General'];
   const imagenes = ['https://i.imgur.com/2nCt3Sbl.jpg']
   let idReceta = 0;

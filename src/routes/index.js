@@ -4,26 +4,15 @@ const router = Router();
 const userExtractor = require('../middlewares/userExtractor')
 
 
-
-const {getUsersById,logearUsuario,registrarUsuario,editarPerfil} = require('../controllers/user-controller/user-controller')
-const {getAllRecipes,getRecipesByUserId,crearNuevaReceta,eliminarReceta,editarReceta,buscarReceta} = require('../controllers/recipe-controller/recipe-controller')
 const {getTagsByRecipeID,getAllTags,agregarTag,eliminarTag,editarTag} = require('../controllers/tag-controller/tag-controller')
 const {getComentarioByRecipeId,guardarComentario} = require('../controllers/comentario-controller/comentario-controller')
 
 
 //Ruta usuario
-router.get('/usuarios/:id/',getUsersById);
-router.post('/login/', logearUsuario);
-router.post('/usuarios/', registrarUsuario)
-router.put('/editusuario/',userExtractor,editarPerfil)
+router.use('/usuarios',require('./users'))
 //Ruta Receta
-router.get('/recetas/',getAllRecipes);
-router.get('/recetas/:id',getRecipesByUserId);
-router.post('/recetas/' ,crearNuevaReceta)
-router.post('/recetas/',userExtractor ,crearNuevaReceta)
-router.delete('/eliminarreceta/:id',userExtractor ,eliminarReceta)
-router.put('/editreceta/',userExtractor ,editarReceta)
-router.get('/buscarRecetas/:palabraclave',buscarReceta)
+router.use('/recetas',require('./recipes'))
+
 //Ruta Tag
 router.get('/tags/',getAllTags);
 router.get('/tags/:id',getTagsByRecipeID);
