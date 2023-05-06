@@ -9,8 +9,10 @@ const getUsersById = (req,res,next) => {
     const id = req.params.id;
     try{
         pool
-            .query(`SELECT * FROM usuarios where id = ${id}`)
+            
+            .query(`SELECT id,username,email,foto_perfil,descripcion FROM usuarios where id = ${id}`)
             .then(response=> {
+                
                 if(response.rows.length == 0){
                     res.status(401).json({Error:'Id no existe'});
                 }
@@ -20,7 +22,7 @@ const getUsersById = (req,res,next) => {
             })
             .catch(err=> res.status(401).json({Error: err.message}))
     }catch(e){
-        console.log(e);
+        console.log(e,"que onda");
         next(e)
     }
 }
