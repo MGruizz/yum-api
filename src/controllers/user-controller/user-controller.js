@@ -29,13 +29,13 @@ const logearUsuario = async (req, res,next) => {
     console.log(email, password);
     try{
         await pool
-            .query('SELECT * FROM usuarios where correoelectronico = $1', [correoElectronico])
+            .query('SELECT * FROM usuarios where email = $1', [email])
             .then(results => {
                 if(results.rows.length > 0) {
                     const user = results.rows[0];
                     const userToken = {
-                        idusuario:user.idusuario,
-                        correoelectronico:user.correoelectronico,
+                        id:user.id,
+                        email:user.email,
                     }
                      bcryptjs.compare(password, user.password, (err, isMatch) => {
                         if(err) {
@@ -57,6 +57,7 @@ const logearUsuario = async (req, res,next) => {
             .catch(err => res.status(401).json({Error: err.message}))
     }
     catch(err){
+        console.log("No se que pasa")
         next(e);
     }
 }
@@ -105,7 +106,7 @@ const editarPerfil = async (req,res,next) => {
             })
             .catch(err => res.status(401).json({Error:err.message}))
     }
-    catch(e){
+    catch(e) {
         next(e);
     }
 }
