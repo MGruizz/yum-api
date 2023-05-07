@@ -37,7 +37,11 @@ const logearUsuario = async (req, res,next) => {
                 if(results.rows.length > 0) {
                     const user = results.rows[0];
                     const userToken = {
+<<<<<<< HEAD
                         idusuario:user.idusuario,
+=======
+                        id:user.id,
+>>>>>>> register
                         email:user.email,
                     }
                      bcryptjs.compare(password, user.password, (err, isMatch) => {
@@ -60,6 +64,7 @@ const logearUsuario = async (req, res,next) => {
             .catch(err => res.status(401).json({Error: err.message}))
     }
     catch(err){
+        console.log("No se que pasa")
         next(e);
     }
 }
@@ -108,7 +113,7 @@ const editarPerfil = async (req,res,next) => {
             })
             .catch(err => res.status(401).json({Error:err.message}))
     }
-    catch(e){
+    catch(e) {
         next(e);
     }
 }
