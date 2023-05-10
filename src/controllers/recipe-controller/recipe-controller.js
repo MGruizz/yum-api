@@ -25,7 +25,17 @@ const getRecipesByUserId = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  
+}
+
+const getAllCategorias = async (req, res, next) => {
+  try {
+    await pool
+      .query(`select * from categorias`)
+      .then(results => res.status(200).json(results.rows))
+      .catch(err => next(err))
+  } catch (error) {
+    next(error);
+  }
 }
 
 
@@ -277,5 +287,6 @@ module.exports = {
   eliminarReceta,
   editarReceta,
   buscarReceta,
-  getPopularRecipes
+  getPopularRecipes,
+  getAllCategorias
 }

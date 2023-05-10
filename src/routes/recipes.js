@@ -2,7 +2,7 @@ const {Router} = require ('express');
 const recipes = Router();
 const userExtractor = require('../middlewares/userExtractor')
 
-const {getAllRecipes,getRecipesByUserId,crearNuevaReceta,eliminarReceta,editarReceta,buscarReceta,getPopularRecipes} = require('../controllers/recipe-controller/recipe-controller')
+const {getAllRecipes,getRecipesByUserId,crearNuevaReceta,eliminarReceta,editarReceta,buscarReceta,getPopularRecipes,getAllCategorias} = require('../controllers/recipe-controller/recipe-controller')
 
 
 recipes.route('/')
@@ -12,6 +12,8 @@ recipes.route('/')
 //     .get(getRecipesByUserId);
 recipes.route("/recetasPopulares/")
     .get(getPopularRecipes)
+recipes.route("/categorias/")
+    .get(getAllCategorias)
 
 recipes.delete('/eliminarreceta/:id',userExtractor ,eliminarReceta)
 recipes.put('/editreceta/',userExtractor ,editarReceta)
