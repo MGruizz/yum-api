@@ -45,12 +45,10 @@ const crearNuevaReceta = async (req, res, next) => {
     descripcionReceta,
     ingredientesReceta,
     pasosReceta,
-    tags,
+    categoriasReceta,
   } = req.body;
 
-  const categorias = ['General'];
   const imagenes = ['https://i.imgur.com/2nCt3Sbl.jpg']
-  let idReceta = 0;
   const { idusuario } = req;
 
   try {
@@ -107,11 +105,11 @@ const crearNuevaReceta = async (req, res, next) => {
       }
 
       // Insertar categorías
-      for (let i in categorias) {
+      for (let i in categoriasReceta) {
         try {
           const categoriaResult = await client.query(
-            `SELECT id FROM categorias WHERE nombre = $1`,
-            [categorias[i]]
+            `SELECT id FROM categorias WHERE id = $1`,
+            [categoriasReceta[i]]
           );
 
           if (categoriaResult.rowCount > 0) {
@@ -122,9 +120,9 @@ const crearNuevaReceta = async (req, res, next) => {
               categoriaId,
             ]);
 
-            console.log(`Categoría ${categorias[i]} insertada a la receta`);
+            console.log(`Categoría ${categoriasReceta[i]} insertada a la receta`);
           } else {
-            console.log(`Categoría ${categorias[i]} no encontrada`);
+            console.log(`Categoría ${categoriasReceta[i]} no encontrada`);
           }
         } catch (err) {
           console.log(err.message);
