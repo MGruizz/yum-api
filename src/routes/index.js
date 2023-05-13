@@ -6,13 +6,14 @@ const userExtractor = require('../middlewares/userExtractor')
 
 const {getTagsByRecipeID,getAllTags,agregarTag,eliminarTag,editarTag} = require('../controllers/tag-controller/tag-controller')
 const {getComentarioByRecipeId,guardarComentario} = require('../controllers/comentario-controller/comentario-controller')
-const {getRecipesByUserId} = require('../controllers/recipe-controller/recipe-controller')
+const {getRecipesByUserId, getRecipeById} = require('../controllers/recipe-controller/recipe-controller')
 
 //Ruta usuario
 router.use('/usuarios',require('./users'))
 //Ruta Receta
 router.use('/recetas',require('./recipes'))
 router.use('/recetas/:id',getRecipesByUserId)
+router.use('/receta/:id',getRecipeById)
 //Ruta Tag
 router.get('/tags/',getAllTags);
 router.get('/tags/:id',getTagsByRecipeID);

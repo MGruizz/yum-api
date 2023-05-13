@@ -2,7 +2,7 @@ const {Router} = require ('express');
 const recipes = Router();
 const userExtractor = require('../middlewares/userExtractor')
 
-const {getAllRecipes,getRecipesByUserId,crearNuevaReceta,eliminarReceta,editarReceta,buscarReceta,getPopularRecipes,getAllCategorias} = require('../controllers/recipe-controller/recipe-controller')
+const {getAllRecipes,getRecipesByUserId,crearNuevaReceta,eliminarReceta,editarReceta,buscarReceta,getPopularRecipes,getAllCategorias, getRecipeById} = require('../controllers/recipe-controller/recipe-controller')
 
 
 recipes.route('/')

@@ -278,6 +278,18 @@ const getPopularRecipes = async (req, res) => {
   }
 };
 
+const getRecipeById = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await pool
+      .query(`select * from recetas where id = ${id}`)
+      .then(results => res.status(200).json(results.rows))
+      .catch(err => next(err))
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getAllRecipes,
   getRecipesByUserId,
@@ -286,5 +298,6 @@ module.exports = {
   editarReceta,
   buscarReceta,
   getPopularRecipes,
-  getAllCategorias
+  getAllCategorias,
+  getRecipeById
 }
