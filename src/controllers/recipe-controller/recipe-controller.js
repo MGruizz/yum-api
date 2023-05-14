@@ -283,6 +283,30 @@ const getRecipeById = async (req, res, next) => {
   try {
     await pool
       .query(`select * from recetas where id = ${id}`)
+      .then(results => res.status(200).json(results.rows[0]))
+      .catch(err => next(err))
+  } catch (error) {
+    next(error);
+  }
+}
+
+const getStepsByRecipeId = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await pool
+      .query(`select * from pasos where receta_id = ${id} order by numero`)
+      .then(results => res.status(200).json(results.rows))
+      .catch(err => next(err))
+  } catch (error) {
+    next(error);
+  }
+}
+
+const getIngredientsByRecipeId = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await pool
+      .query(`select * from ingredientes where receta_id = ${id}`)
       .then(results => res.status(200).json(results.rows))
       .catch(err => next(err))
   } catch (error) {
@@ -299,5 +323,7 @@ module.exports = {
   buscarReceta,
   getPopularRecipes,
   getAllCategorias,
-  getRecipeById
+  getRecipeById,
+  getStepsByRecipeId,
+  getIngredientsByRecipeId
 }
