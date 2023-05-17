@@ -35,7 +35,20 @@ const guardarComentario = async(req,res,next)=>{
     }
 }
 
+const getCommentsByRecipeId = async (req, res, next) => {
+    const id = req.params.id;
+    try {
+      await pool
+        .query(`select * from comentarios where receta_id = ${id}`)
+        .then(results => res.status(200).json(results.rows))
+        .catch(err => next(err))
+    } catch (error) {
+      next(error);
+    }
+  }
+
 module.exports = {
     guardarComentario,
-    getComentarioByRecipeId
+    getComentarioByRecipeId,
+    getCommentsByRecipeId
 }
