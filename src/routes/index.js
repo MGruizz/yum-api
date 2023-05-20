@@ -6,7 +6,7 @@ const userExtractor = require('../middlewares/userExtractor')
 
 const {getTagsByRecipeID,getAllTags,agregarTag,eliminarTag,editarTag} = require('../controllers/tag-controller/tag-controller')
 const {getComentarioByRecipeId,guardarComentario, getCommentsByRecipeId} = require('../controllers/comentario-controller/comentario-controller')
-const {getRecipesByUserId, getRecipeById, getStepsByRecipeId, getIngredientsByRecipeId} = require('../controllers/recipe-controller/recipe-controller')
+const {getRecipesByUserId, getRecipeById, getStepsByRecipeId, getIngredientsByRecipeId,getImagesRecipe} = require('../controllers/recipe-controller/recipe-controller')
 
 //Ruta usuario
 router.use('/usuarios',require('./users'))
@@ -16,6 +16,7 @@ router.use('/recetas/:id',getRecipesByUserId)
 router.get('/receta/:id',getRecipeById)
 router.get('/pasos/receta/:id',getStepsByRecipeId)
 router.get('/ingredientes/receta/:id',getIngredientsByRecipeId)
+router.get('/imagenes/receta/:id',getImagesRecipe)
 
 //Ruta Tag
 router.get('/tags/',getAllTags);

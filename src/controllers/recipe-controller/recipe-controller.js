@@ -314,6 +314,18 @@ const getIngredientsByRecipeId = async (req, res, next) => {
   }
 }
 
+const getImagesRecipe = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await pool
+      .query(`select imagen_url from recetas_imagenes where receta_id = ${id}`)
+      .then(results => res.status(200).json(results.rows))
+      .catch(err => next(err))
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getAllRecipes,
   getRecipesByUserId,
@@ -325,5 +337,6 @@ module.exports = {
   getAllCategorias,
   getRecipeById,
   getStepsByRecipeId,
-  getIngredientsByRecipeId
+  getIngredientsByRecipeId,
+  getImagesRecipe
 }

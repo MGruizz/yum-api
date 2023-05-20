@@ -29,7 +29,7 @@ const logearUsuario = async (req, res,next) => {
     console.log(email, password);
     try{
         await pool
-            .query('SELECT * FROM usuarios where email = $1', [email])
+            .query('SELECT id, username, email, password, descripcion, foto_perfil FROM usuarios where email = $1', [email])
             .then(results => {
                 if(results.rows.length > 0) {
                     const user = results.rows[0];
@@ -44,6 +44,7 @@ const logearUsuario = async (req, res,next) => {
                         }
                         if(isMatch) {
                             const token = jwt.sign(userToken,process.env.SECRET)
+                            delete user.password;
                             res.status(200).send({user,token});
                         }
                         else{
