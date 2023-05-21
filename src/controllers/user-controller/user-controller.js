@@ -117,7 +117,7 @@ const editarPerfil = async (req, res, next) => {
 
                 const newToken = jwt.sign(userForToken, process.env.SECRET);
 
-                res.status(200).json({ token: newToken });
+                res.status(200).json({ token: newToken, user: userForToken });
             })
             .catch(err => {
                 console.log(err.message );
