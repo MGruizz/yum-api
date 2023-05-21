@@ -326,6 +326,50 @@ const getImagesRecipe = async (req, res, next) => {
   }
 }
 
+const getRecipesFullByUserId = async (req, res, next) => {
+  try {
+    const results = await pool.query(`
+    SELECT recetas.id, recetas.descripcion, recetas.usuario_id, recetas.created_at, recetas.updated_at, recetas.deleted, recetas.nombre, recetas.likes, recetas.visitas, recetas_imagenes.imagen_url
+    FROM recetas
+    LEFT JOIN recetas_imagenes ON recetas.id = recetas_imagenes.receta_id
+    WHERE recetas.usuario_id = ${req.params.id};
+    `);
+
+    const recipes = {};
+
+    for (let row of results.rows) {
+      if (!recipes[row.id]) {
+        // Si no hemos visto esta receta antes, la agregamos a nuestro objeto de recetas.
+        recipes[row.id] = {
+          id: row.id,
+          descripcion: row.descripcion,
+          usuario_id: row.usuario_id,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          deleted: row.deleted,
+          nombre: row.nombre,
+          likes: row.likes,
+          visitas: row.visitas,
+          imagenes: []
+        };
+      }
+
+      if (row.imagen_url) {
+        // Agregamos la URL de la imagen a la lista de imágenes para esta receta.
+        recipes[row.id].imagenes.push(row.imagen_url);
+      }
+    }
+
+    // Convertimos nuestro objeto de recetas en un array de recetas.
+    const recipesArray = Object.values(recipes);
+
+    res.status(200).json(recipesArray);
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 module.exports = {
   getAllRecipes,
   getRecipesByUserId,
@@ -338,5 +382,5 @@ module.exports = {
   getRecipeById,
   getStepsByRecipeId,
   getIngredientsByRecipeId,
-  getImagesRecipe
+  getRecipesFullByUserId
 }

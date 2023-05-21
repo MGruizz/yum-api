@@ -169,7 +169,7 @@ const verificarSeguidor = async(req, res, next) => {
 
 const dejarDeSeguir = async(req, res, next) => {
     const {id_usuario_seguido, id_usuario_seguidor} = req.body;
-    console.log(id_usuario_seguido, id_usuario_seguidor);
+    
     try{
         await pool
             .query('DELETE FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2', 
@@ -178,7 +178,7 @@ const dejarDeSeguir = async(req, res, next) => {
             .catch(err => res.status(401).json({Error: err.message}))
     }
     catch(err){
-        console.log("No se que pasa")
+        
         next(e);
     }
 }
