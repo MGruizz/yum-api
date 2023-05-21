@@ -5,9 +5,13 @@ const {getUsersById,logearUsuario,registrarUsuario,editarPerfil} = require('../c
 
 user.route('/')
     .post(registrarUsuario)
-user.get('/:id/',getUsersById);
+user.route('/:id')
+    .get(getUsersById)
+    .put(userExtractor,editarPerfil)
 user.post('/login/', logearUsuario);
-user.put('/editusuario/',userExtractor,editarPerfil)
+
+
+// user.put('/editusuario/',userExtractor,editarPerfil)
 
 
 module.exports = user;
