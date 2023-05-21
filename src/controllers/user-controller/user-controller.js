@@ -113,11 +113,67 @@ const editarPerfil = async (req,res,next) => {
     }
 }
 
+const seguirUsuario = async (req, res, next) => {
+    const {id_usuario_seguido, id_usuario_seguidor} = req.body;
+    console.log(id_usuario_seguido, id_usuario_seguidor);
+    try{
+        await pool
+            .query('INSERT INTO seguidores (id_usuario_seguido, id_usuario_seguidor) VALUES ($1, $2)', 
+            [id_usuario_seguido, id_usuario_seguidor])
+            .then(results => res.status(200).send({res:'Usuario seguido con éxito'}))
+            .catch(err => res.status(401).json({Error: err.message}))
+    }
+    catch(err){
+        console.log("No se que pasa")
+        next(e);
+    }
+}
+
+const verificarSeguidor = async(req, res, next) => {
+    const {id_usuario_seguido, id_usuario_seguidor} = req.body;
+    console.log(id_usuario_seguido, id_usuario_seguidor);
+    try{
+        await pool
+            .query('SELECT * FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2', 
+            [id_usuario_seguido, id_usuario_seguidor])
+            .then(results => {
+                if(results.rowCount > 0){
+                    res.status(200).json({isFollowing: true});
+                }else{
+                    res.status(200).json({isFollowing: false});
+                }
+            })
+            .catch(err => res.status(401).json({Error: err.message}))
+    }
+    catch(err){
+        console.log("No se que pasa")
+        next(e);
+    }
+}
+
+const dejarDeSeguir = async(req, res, next) => {
+    const {id_usuario_seguido, id_usuario_seguidor} = req.body;
+    console.log(id_usuario_seguido, id_usuario_seguidor);
+    try{
+        await pool
+            .query('DELETE FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2', 
+            [id_usuario_seguido, id_usuario_seguidor])
+            .then(results => res.status(200).send({res:'Usuario seguido con éxito'}))
+            .catch(err => res.status(401).json({Error: err.message}))
+    }
+    catch(err){
+        console.log("No se que pasa")
+        next(e);
+    }
+}
+
 
 module.exports = {
     getUsersById,
     logearUsuario,
     registrarUsuario,
     editarPerfil,
-
+    seguirUsuario,
+    verificarSeguidor,
+    dejarDeSeguir,
 }
