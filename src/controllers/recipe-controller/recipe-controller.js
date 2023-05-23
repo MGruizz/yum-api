@@ -3,8 +3,8 @@ const pool = require('../../configs/db.config')
 const getAllRecipes = async (req, res, next) => {
   try {
     await pool
-      .query(`SELECT recetas.idautor,recetas.idreceta,recetas.nombrereceta,recetas.descripcionreceta,recetas.ingredientes,recetas.pasosreceta,recetas.imagenes,usuarios.nombrepersona
-             FROM recetas join usuarios on idautor = idusuario`)
+      .query(`SELECT recetas.usuario_id,recetas.id,recetas.nombre,recetas.descripcion,usuarios.username
+             FROM recetas join usuarios on recetas.usuario_id = usuarios.id`)
       .then(response => {
         res.status(200).json(response.rows)
       })

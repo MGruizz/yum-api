@@ -6,7 +6,8 @@ const userExtractor = require('../middlewares/userExtractor')
 
 const {getTagsByRecipeID,getAllTags,agregarTag,eliminarTag,editarTag} = require('../controllers/tag-controller/tag-controller')
 const {getComentarioByRecipeId,guardarComentario, getCommentsByRecipeId} = require('../controllers/comentario-controller/comentario-controller')
-const {getRecipesByUserId, getRecipeById, getStepsByRecipeId, getIngredientsByRecipeId,getRecipesFullByUserId} = require('../controllers/recipe-controller/recipe-controller')
+const {getRecipesByUserId, getRecipeById, getStepsByRecipeId, getIngredientsByRecipeId,getRecipesFullByUserId} = require('../controllers/recipe-controller/recipe-controller');
+const { darLike, darUnLike, verificarLike, isLiked } = require('../controllers/like-controller/like-controller');
 
 //Ruta usuario
 router.use('/usuarios',require('./users'))
@@ -29,7 +30,6 @@ router.put('/tags/',userExtractor,editarTag);
 router.get('/comentarios/:id',getComentarioByRecipeId)
 router.post('/comentarios/',userExtractor,guardarComentario)
 router.get('/comentarios/receta/:id',getCommentsByRecipeId)
-
 
 //Not found middleware
 router.use((req,res,next)=>{
