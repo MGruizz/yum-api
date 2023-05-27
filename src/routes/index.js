@@ -13,6 +13,7 @@ const { darLike, darUnLike, verificarLike, isLiked } = require('../controllers/l
 router.use('/usuarios',require('./users'))
 //Ruta Receta
 router.use('/recetas',require('./recipes'))
+
 router.use('/recetas/:id',getRecipesByUserId)
 router.get('/receta/:id',getRecipeById)
 router.get('/pasos/receta/:id',getStepsByRecipeId)

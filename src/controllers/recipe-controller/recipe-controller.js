@@ -367,6 +367,34 @@ const getRecipesFullByUserId = async (req, res, next) => {
   }
 }
 
+const search = async (req, res, next) => {
+  const { palabraclave } = req.body;
+  try {
+    await pool
+      .query(`SELECT recetas.usuario_id,recetas.id,recetas.nombre,recetas.descripcion,usuarios.username 
+            FROM recetas 
+            LEFT JOIN recetas_categorias rc on rc.receta_id = recetas.id 
+            LEFT JOIN categorias on categorias.id = rc.categoria_id 
+            LEFT JOIN ingredientes on ingredientes.receta_id = recetas.id
+            LEFT JOIN usuarios on usuarios.id = recetas.usuario_id
+            WHERE recetas.nombre ILIKE $1 
+            OR recetas.descripcion ILIKE $1 
+            OR ingredientes.nombre ILIKE $1 
+            OR categorias.nombre ILIKE $1`, ['%' + palabraclave + '%'])
+      .then(response => {
+        if (response.rows.length > 0) {
+          res.status(200).json(response.rows)
+        }
+        else {
+          res.status(404).json({ Error: 'No se encuentra informacion' })
+        }
+      })
+      .catch(err => res.status(400).json({ Err: err.message }))
+  } catch (e) {
+    next(e);
+  }
+}
+
 
 module.exports = {
   getAllRecipes,
@@ -380,5 +408,6 @@ module.exports = {
   getRecipeById,
   getStepsByRecipeId,
   getIngredientsByRecipeId,
-  getRecipesFullByUserId
+  getRecipesFullByUserId,
+  search
 }
