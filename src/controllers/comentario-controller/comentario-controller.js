@@ -21,14 +21,25 @@ const getComentarioByRecipeId =async (req,res,next) => {
       
 }
 
+
+
 const guardarComentario = async(req,res,next)=>{
-    const {comentario,nombreAutor, idReceta} = req.body;
+    const {descripcion,usuario_id, receta_id} = req.body;
     try {
         await pool
-            .query (`INSERT INTO comentarios (comentario,nombreusuario, idreceta)VALUES ($1,$2,$3) `,[comentario,nombreAutor,idReceta])
-            .then(results => {
-                res.status(201).json({res:'Insersion exitosa'});
-            })
+            .query (`INSERT INTO comentarios (descripcion,usuario_id,receta_id)VALUES ($1,$2,$3) `,[descripcion,usuario_id,receta_id])
+            .then(async results => {
+                //const newComment = results.rows[0];
+                const userResult = await pool.query(`SELECT username FROM usuarios WHERE id = $1`, [usuario_id]);
+                const username = userResult.rows[0].username;
+        
+                res.status(201).json({
+                  //idComment: newComment.id,
+                  descripcion: descripcion,
+                  usuarioId:usuario_id,
+                  user: {username: username}
+                });
+              })
             .catch(err=> console.log(err.message))
     } catch (error) {
         next (error)
@@ -46,6 +57,7 @@ const getCommentsByRecipeId = async (req, res, next) => {
       next(error);
     }
   }
+
 
 module.exports = {
     guardarComentario,

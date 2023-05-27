@@ -355,12 +355,10 @@ const getRecipesFullByUserId = async (req, res, next) => {
       }
 
       if (row.imagen_url) {
-        // Agregamos la URL de la imagen a la lista de imágenes para esta receta.
         recipes[row.id].imagenes.push(row.imagen_url);
       }
     }
 
-    // Convertimos nuestro objeto de recetas en un array de recetas.
     const recipesArray = Object.values(recipes);
 
     res.status(200).json(recipesArray);
