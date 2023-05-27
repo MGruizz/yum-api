@@ -1,108 +1,138 @@
 const pool = require('../../configs/db.config')
 
-const getAllTags = async (req,res) => {
+const getAllTags = async (req, res) => {
     const response = await pool.query(`SELECT * FROM tags`);
     res.status(200).json(response.rows);
     pool.end;
 }
 
-const getTagsByRecipeID = (req,res) => {
+const getTagsByRecipeID = (req, res) => {
     const idReceta = req.params.id;
-    try{
+    try {
         pool
-        .query(`select tags.idtag,tags.nombre from tag_receta ta join tags ON tags.idtag = ta.idtag where ta.idreceta=$1`,[idReceta])
-        .then(response => {
-            if(response.rows.length > 0){
-                res.status(200).json({res:response.rows})
-            }
-            else{
-                res.status(200).json({res:[]});
-            }
-        })
-        .catch(err => res.status(401).json({Error: err.message}))
-    }catch(e){
+            .query(`select tags.idtag,tags.nombre from tag_receta ta join tags ON tags.idtag = ta.idtag where ta.idreceta=$1`, [idReceta])
+            .then(response => {
+                if (response.rows.length > 0) {
+                    res.status(200).json({ res: response.rows })
+                }
+                else {
+                    res.status(200).json({ res: [] });
+                }
+            })
+            .catch(err => res.status(401).json({ Error: err.message }))
+    } catch (e) {
         next(e);
     }
 }
 
-const agregarTag = async (req,res) => {
-    
+const agregarTag = async (req, res) => {
+
     let tag = req.body.nombre.toLowerCase();
     tag = (tag).charAt(0).toUpperCase() + ((tag).slice(1));
     console.log(tag);
-    try{
+    try {
         await pool
-            .query('SELECT nombre FROM tags WHERE nombre = $1',[tag])
+            .query('SELECT nombre FROM tags WHERE nombre = $1', [tag])
             .then(response => {
-                if(response.rows.length > 0){
-                    res.status(400).json({Error: 'El tag ingresado ya se encuentra ingresado'});
+                if (response.rows.length > 0) {
+                    res.status(400).json({ Error: 'El tag ingresado ya se encuentra ingresado' });
                 }
-                else{
+                else {
                     pool
-                        .query('INSERT INTO tags (nombre) VALUES ($1)',[tag])
+                        .query('INSERT INTO tags (nombre) VALUES ($1)', [tag])
                         .then(response => {
-                            res.status(201).json({Res:'Tag ingresado exitosamente'})
+                            res.status(201).json({ Res: 'Tag ingresado exitosamente' })
                         })
-                        .catch(err => res.status(401).json({Error:err.message}))
+                        .catch(err => res.status(401).json({ Error: err.message }))
                 }
             })
-            .catch(err => res.status(400).json({Error:err.message}))
-    }catch(e){
+            .catch(err => res.status(400).json({ Error: err.message }))
+    } catch (e) {
         next(e);
     }
 }
 
 // Problema al eliminar con clave foranea en tabla NUB
-const eliminarTag = (req,res) => {
-    const idTag= req.params.id;
+const eliminarTag = (req, res) => {
+    const idTag = req.params.id;
     console.log(idTag)
-    try{
+    try {
         pool
-            .query('DELETE FROM tags WHERE idtag = $1 RETURNING nombre',[idTag])
+            .query('DELETE FROM tags WHERE idtag = $1 RETURNING nombre', [idTag])
             .then(response => {
                 console.log(response.rows)
-                if(response.rows.length > 0){
-                    res.status(200).json({res: 'Tag eliminado exitosamente'});
+                if (response.rows.length > 0) {
+                    res.status(200).json({ res: 'Tag eliminado exitosamente' });
                 }
-                else{
-                    res.status(401).json({res:'No se encuentra el tag'})
+                else {
+                    res.status(401).json({ res: 'No se encuentra el tag' })
                 }
             })
-            .catch(err => res.status(401).json({Error:err.message}))
-    }catch(e){
+            .catch(err => res.status(401).json({ Error: err.message }))
+    } catch (e) {
         next(e);
     }
 }
 
 // Mismo problema que eliminar
-const editarTag = (req,res) => {
+const editarTag = (req, res) => {
 
-    let {id,nombre} = req.body;
+    let { id, nombre } = req.body;
     console.log(nombre);
     nombre = nombre.toLowerCase();
     console.log(nombre);
     nombre = (nombre).charAt(0).toUpperCase() + ((nombre).slice(1));
-    
-    try{
+
+    try {
         pool
-            .query('SELECT * FROM tags WHERE idtag = $1',[id])
+            .query('SELECT * FROM tags WHERE idtag = $1', [id])
             .then(response => {
-                if(response.rows.length > 0){
+                if (response.rows.length > 0) {
                     pool
-                        .query('UPDATE TAGS set nombre = $1 where idtag = $2 RETURNING *',[nombre,id])
+                        .query('UPDATE TAGS set nombre = $1 where idtag = $2 RETURNING *', [nombre, id])
                         .then(response => {
-                            res.status(200).json({Res:'Tag actualizado exitosamente',Tag:response.rows[0]})
+                            res.status(200).json({ Res: 'Tag actualizado exitosamente', Tag: response.rows[0] })
                         })
-                        .catch(err => res.status(401).json({Error:err.message}))
-                    
+                        .catch(err => res.status(401).json({ Error: err.message }))
+
                 }
-                else{
-                    res.status(401).json({Error: 'El tag buscado no existe'});
+                else {
+                    res.status(401).json({ Error: 'El tag buscado no existe' });
                 }
             })
-            .catch(err => res.status(401).json({Error:err.message}))
-    }catch(e){
+            .catch(err => res.status(401).json({ Error: err.message }))
+    } catch (e) {
         next(e);
+    }
+}
+
+const getPopularTags = async (req, res) => {
+    try {
+        const popularCategoriesResult = await pool.query(
+            `SELECT categorias.id, categorias.nombre, count(*) as recetas_count
+            FROM categorias 
+            JOIN recetas_categorias ON categorias.id = recetas_categorias.categoria_id
+            GROUP BY categorias.id, categorias.nombre
+            ORDER BY recetas_count DESC LIMIT 3`
+        );
+
+        let popularCategories = popularCategoriesResult.rows;
+
+        if (popularCategories.length < 3) {
+            const allTimePopularCategoriesResult = await pool.query(
+                `SELECT categorias.id, categorias.nombre, count(*) as recetas_count
+                FROM categorias 
+                JOIN recetas_categorias ON categorias.id = recetas_categorias.categoria_id
+                WHERE categorias.id NOT IN (${popularCategories.map(r => r.id).join(', ')})
+                GROUP BY categorias.id, categorias.nombre
+                ORDER BY recetas_count DESC LIMIT ${3 - popularCategories.length}`
+            );
+
+            popularCategories = [...popularCategories, ...allTimePopularCategoriesResult.rows];
+        }
+        res.status(200).json({ popularCategories });
+    } catch (err) {
+        res.status(500).json({ message: 'Error al obtener las categorías populares' });
     }
 }
 
@@ -111,5 +141,6 @@ module.exports = {
     getTagsByRecipeID,
     agregarTag,
     eliminarTag,
-    editarTag
+    editarTag,
+    getPopularTags
 }

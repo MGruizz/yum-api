@@ -20,11 +20,8 @@ router.get('/ingredientes/receta/:id',getIngredientsByRecipeId)
 router.get('/imagenes/receta/:id',getRecipesFullByUserId)
 
 //Ruta Tag
-router.get('/tags/',getAllTags);
-router.get('/tags/:id',getTagsByRecipeID);
-router.post('/tags/',userExtractor,agregarTag);
-router.delete('/tags/:id',userExtractor,eliminarTag);
-router.put('/tags/',userExtractor,editarTag);
+router.use('/tags',require('./tags'))
+
 
 // Ruta comentario
 router.get('/comentarios/:id',getComentarioByRecipeId)
