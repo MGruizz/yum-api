@@ -396,15 +396,16 @@ const search = async (req, res, next) => {
 }
 
 const searchByCategory = async (req, res, next) => {
-  const { palabraclave } = req.body;
+  const { palabraclave } = req.params;
+  console.log(palabraclave);
   try {
     await pool
-      .query(`SELECT recetas.usuario_id,recetas.id,recetas.nombre,recetas.descripcion,usuarios.username 
+      .query(`SELECT distinct recetas.usuario_id,recetas.id,recetas.nombre,recetas.descripcion,usuarios.username 
             FROM recetas 
-            LEFT JOIN recetas_categorias rc on rc.receta_id = recetas.id 
-            LEFT JOIN categorias on categorias.id = rc.categoria_id 
-            LEFT JOIN ingredientes on ingredientes.receta_id = recetas.id
-            LEFT JOIN usuarios on usuarios.id = recetas.usuario_id
+            JOIN recetas_categorias rc on rc.receta_id = recetas.id 
+            JOIN categorias on categorias.id = rc.categoria_id 
+            JOIN ingredientes on ingredientes.receta_id = recetas.id
+            JOIN usuarios on usuarios.id = recetas.usuario_id
             WHERE categorias.nombre = $1`, [palabraclave])
       .then(response => {
         if (response.rows.length > 0) {

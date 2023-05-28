@@ -17,7 +17,7 @@ recipes.route("/categorias/")
     .get(getAllCategorias)
 recipes.route("/buscar/")
     .post(search)
-tag.route('/searchByCategory/:categoryname')
+recipes.route('/searchByCategory/:palabraclave')
     .get(searchByCategory)
 
 // Gestion recetas
