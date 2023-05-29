@@ -63,12 +63,9 @@ const logearUsuario = async (req, res, next) => {
     }
 }
 
-
-
 const registrarUsuario = async (req, res, next) => {
-    const { nickname, email, password } = req.body;
+    const { username, email, password } = req.body;
     const imagen = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
-    console.log({ email, password })
     let hashPassword = await bcryptjs.hash(password, 10);
     const admin = false;
     const deleted = false;
@@ -81,7 +78,7 @@ const registrarUsuario = async (req, res, next) => {
                 } else {
                     pool
                         .query(`INSERT INTO usuarios (username, email, password,foto_perfil)
-                        VALUES ($1, $2, $3,$4)`, [nickname, email, hashPassword, imagen])
+                        VALUES ($1, $2, $3,$4)`, [username, email, hashPassword, imagen])
                         .then(results => res.status(200).send({ res: 'Usuario registrado correctamente' }))
                         .catch(err => res.status(401).json({ Error: err.message }))
                 }
@@ -97,7 +94,6 @@ const registrarUsuario = async (req, res, next) => {
 const editarPerfil = async (req, res, next) => {
     let {nombreUsuario, descripcion } = req.body;
     let  idUsuario  = req.id
-    console.log(nombreUsuario, descripcion, idUsuario);
     // if(fotoPerfil == null || fotoPerfil == ''){
     //     fotoPerfil = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
     // }
@@ -105,7 +101,6 @@ const editarPerfil = async (req, res, next) => {
         await pool
             .query('UPDATE usuarios SET username = $1, descripcion = $2 where id = $3 RETURNING *', [nombreUsuario, descripcion, idUsuario])
             .then(response => {
-                console.log(response.rows);
                 const updatedUser = response.rows[0];
 
                 const userForToken = {
@@ -131,7 +126,6 @@ const editarPerfil = async (req, res, next) => {
 
 const seguirUsuario = async (req, res, next) => {
     const {id_usuario_seguido, id_usuario_seguidor} = req.body;
-    console.log(id_usuario_seguido, id_usuario_seguidor);
     try{
         await pool
             .query('INSERT INTO seguidores (id_usuario_seguido, id_usuario_seguidor) VALUES ($1, $2)', 
