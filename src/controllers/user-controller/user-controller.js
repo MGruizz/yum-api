@@ -28,7 +28,7 @@ const logearUsuario = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         await pool
-            .query('SELECT id, username, email, password, descripcion, foto_perfil FROM usuarios where email = $1', [email])
+            .query('SELECT id, username, email, password, descripcion, foto_perfil, is_admin FROM usuarios where email = $1', [email])
             .then(results => {
                 if (results.rows.length > 0) {
                     const user = results.rows[0];
@@ -36,6 +36,7 @@ const logearUsuario = async (req, res, next) => {
                     const userToken = {
                         id: user.id,
                         email: user.email,
+                        is_admin: user.is_admin,
                     }
                     bcryptjs.compare(password, user.password, (err, isMatch) => {
                         if (err) {
@@ -108,6 +109,7 @@ const editarPerfil = async (req, res, next) => {
                     id: updatedUser.id,
                     email: updatedUser.email,
                     descripcion: updatedUser.descripcion,
+                    is_admin: updatedUser.is_admin,
                 }
 
                 const newToken = jwt.sign(userForToken, process.env.SECRET);
