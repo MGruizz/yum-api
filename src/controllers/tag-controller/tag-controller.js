@@ -26,20 +26,20 @@ const getTagsByRecipeID = (req, res) => {
 }
 
 const agregarTag = async (req, res) => {
-
-    let tag = req.body.nombre.toLowerCase();
+    let tag = req.body.nombre.nombreCategoria.toLowerCase();
+    
     tag = (tag).charAt(0).toUpperCase() + ((tag).slice(1));
-    console.log(tag);
+
     try {
         await pool
-            .query('SELECT nombre FROM tags WHERE nombre = $1', [tag])
+            .query('SELECT nombre FROM categorias WHERE nombre = $1', [tag])
             .then(response => {
                 if (response.rows.length > 0) {
-                    res.status(400).json({ Error: 'El tag ingresado ya se encuentra ingresado' });
+                    res.status(400).json({ Error: 'La categoria ingresada ya se encuentra ingresada' });
                 }
                 else {
                     pool
-                        .query('INSERT INTO tags (nombre) VALUES ($1)', [tag])
+                        .query('INSERT INTO categorias (nombre) VALUES ($1)', [tag])
                         .then(response => {
                             res.status(201).json({ Res: 'Tag ingresado exitosamente' })
                         })
