@@ -8,21 +8,15 @@ const getAllTags = async (req, res) => {
 
 const getTagsByRecipeID = (req, res) => {
     const idReceta = req.params.id;
+    console.log(idReceta);
     try {
         pool
-            .query(`select tags.idtag,tags.nombre from tag_receta ta join tags ON tags.idtag = ta.idtag where ta.idreceta=$1`, [idReceta])
-            .then(response => {
-                if (response.rows.length > 0) {
-                    res.status(200).json({ res: response.rows })
-                }
-                else {
-                    res.status(200).json({ res: [] });
-                }
-            })
-            .catch(err => res.status(401).json({ Error: err.message }))
-    } catch (e) {
-        next(e);
-    }
+            .query(`SELECT id,nombre FROM recetas_categorias reca join categorias cate on cate.id=reca.categoria_id where receta_id=${idReceta}`)
+            .then(results => res.status(200).json(results.rows))
+      .catch(err => next(err))
+  } catch (error) {
+    next(error);
+  }
 }
 
 const agregarTag = async (req, res) => {

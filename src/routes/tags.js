@@ -9,4 +9,7 @@ tag.route('/')
 tag.route('/popularTags/')
     .get(getPopularTags)
 
+tag.route('/tagsPorReceta/:id')
+    .get(getTagsByRecipeID)
+
 module.exports = tag;
