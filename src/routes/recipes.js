@@ -2,13 +2,14 @@ const {Router} = require ('express');
 const recipes = Router();
 const userExtractor = require('../middlewares/userExtractor')
 
+
 const {getAllRecipes,getRecipesByUserId,crearNuevaReceta,eliminarReceta,editarReceta,buscarReceta,getPopularRecipes,getAllCategorias,search,searchByCategory} = require('../controllers/recipe-controller/recipe-controller');
 const { likesByRecipeId } = require('../controllers/like-controller/like-controller');
 
 
 recipes.route('/')
     .get(getAllRecipes)
-    .post(crearNuevaReceta)
+    .post(userExtractor, crearNuevaReceta)
 // recipes.route('/:id')
 //     .get(getRecipesByUserId);
 recipes.route("/recetasPopulares/")

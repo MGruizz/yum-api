@@ -1,4 +1,5 @@
-const pool = require('../../configs/db.config')
+const pool = require('../../configs/db.config');
+const {uploadToAzure} = require('../../Services/storage');
 
 const getAllRecipes = async (req, res, next) => {
   try {
@@ -46,10 +47,10 @@ const crearNuevaReceta = async (req, res, next) => {
     ingredientesReceta,
     pasosReceta,
     categoriasReceta,
+    imagenesReceta
   } = req.body;
 
-  const imagenes = ['https://i.imgur.com/2nCt3Sbl.jpg']
-  const { idusuario } = req;
+  let  idUsuario  = req.id
 
   try {
     const client = await pool.connect();
@@ -62,7 +63,7 @@ const crearNuevaReceta = async (req, res, next) => {
       const recetaResult = await client.query(
         `INSERT INTO recetas (usuario_id, nombre, descripcion) VALUES ($1, $2, $3) RETURNING id`,
         [
-          idusuario,
+          idUsuario,
           nombreReceta,
           descripcionReceta,
         ]
@@ -129,16 +130,30 @@ const crearNuevaReceta = async (req, res, next) => {
         }
       }
 
+      let j = 1;
       // Insertar imágenes
-      for (let i in imagenes) {
+      for (let i in imagenesReceta) {
+
         try {
-          await client.query(`INSERT INTO recetas_imagenes (receta_id, imagen_url) VALUES ($1, $2)`, [
-            idReceta,
-            imagenes[i],
-          ]);
+
+          const imagenUrl = await uploadToAzure(imagenesReceta[i], 'imagen_' + j + '_' + idReceta);
+
+          if(imagenUrl) {
+
+            await client.query(`INSERT INTO recetas_imagenes (receta_id, imagen_url) VALUES ($1, $2)`, [
+              idReceta,
+              imagenUrl,
+            ]);
+          } else {
+            console.log("Error guardando imagen en azure :(");
+          }
+
+          j++;
 
         } catch (err) {
+          console.log("Error en las imagenes:(");
           console.log(err.message);
+          res.status(400).json({ res: 'Error al manejar las imagenes.' });
         }
       }
 
