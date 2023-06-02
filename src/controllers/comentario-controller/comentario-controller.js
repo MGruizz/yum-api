@@ -58,9 +58,22 @@ const getCommentsByRecipeId = async (req, res, next) => {
     }
   }
 
+  const eliminarComentario = async (req, res, next) => {
+    const id = req.params.id;
+    console.log(id)
+    try {
+      await pool
+        .query('DELETE FROM comentarios WHERE id = $1 RETURNING descripcion', [id])
+        .then(results => res.status(200).json(results.rows))
+        .catch(err => next(err))
+    } catch (error) {
+      next(error);
+    }
+  }
 
 module.exports = {
     guardarComentario,
     getComentarioByRecipeId,
-    getCommentsByRecipeId
+    getCommentsByRecipeId,
+    eliminarComentario
 }
