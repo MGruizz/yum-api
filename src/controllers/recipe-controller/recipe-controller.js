@@ -296,7 +296,7 @@ const getPopularRecipes = async (req, res) => {
 const getRecipeById = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const { rows: [recipe] } = await pool.query('SELECT * FROM recetas WHERE id = $1', [id]);
+    const { rows: [recipe] } = await pool.query('SELECT *, (SELECT COUNT(*) FROM likes WHERE receta_id = $1) as likes FROM recetas WHERE id = $1', [id]);
     const { rows: imagenes } = await pool.query('SELECT * FROM recetas_imagenes WHERE receta_id = $1', [id]);
 
     if (recipe) {
