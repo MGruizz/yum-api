@@ -296,14 +296,19 @@ const getPopularRecipes = async (req, res) => {
 const getRecipeById = async (req, res, next) => {
   const id = req.params.id;
   try {
-    await pool
-      .query(`select * from recetas where id = ${id}`)
-      .then(results => res.status(200).json(results.rows[0]))
-      .catch(err => next(err))
+    const { rows: [recipe] } = await pool.query('SELECT * FROM recetas WHERE id = $1', [id]);
+    const { rows: imagenes } = await pool.query('SELECT * FROM recetas_imagenes WHERE receta_id = $1', [id]);
+
+    if (recipe) {
+      recipe.imagenes = imagenes.map(image => image.imagen_url);
+      res.status(200).json(recipe);
+    } else {
+      res.status(404).json({ error: 'Receta no encontrada' });
+    }
   } catch (error) {
     next(error);
   }
-}
+};
 
 const getStepsByRecipeId = async (req, res, next) => {
   const id = req.params.id;
