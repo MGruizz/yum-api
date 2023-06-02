@@ -179,6 +179,34 @@ const dejarDeSeguir = async(req, res, next) => {
     }
 }
 
+const obtenerInformacionUsuario = async (req, res, next) => {
+    const { id } = req.params;
+    try{
+        const seguidores = await pool
+            .query('SELECT COUNT(id_usuario_seguidor) FROM seguidores WHERE id_usuario_seguido = $1', 
+            [id]);
+
+        const seguidos = await pool
+            .query('SELECT COUNT(id_usuario_seguido) FROM seguidores WHERE id_usuario_seguidor = $1', 
+            [id]);
+
+        const publicaciones = await pool
+            .query('SELECT COUNT(id) FROM recetas WHERE recetas.usuario_id = $1', 
+            [id]);    
+
+        res.status(200).send({
+            seguidores: seguidores.rows[0].count,
+            seguidos: seguidos.rows[0].count,
+            publicaciones: publicaciones.rows[0].count
+        })
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).json({Error: err.message})
+    }
+}
+
+
 
 module.exports = {
     getUsersById,
@@ -188,4 +216,5 @@ module.exports = {
     seguirUsuario,
     verificarSeguidor,
     dejarDeSeguir,
+    obtenerInformacionUsuario
 }

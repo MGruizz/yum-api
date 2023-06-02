@@ -1,7 +1,7 @@
 const {Router} = require ('express');
 const user = Router();
 const userExtractor = require('../middlewares/userExtractor')
-const {getUsersById,logearUsuario,registrarUsuario,editarPerfil,seguirUsuario,verificarSeguidor,dejarDeSeguir} = require('../controllers/user-controller/user-controller');
+const {getUsersById,logearUsuario,registrarUsuario,editarPerfil,seguirUsuario,verificarSeguidor,dejarDeSeguir, obtenerInformacionUsuario} = require('../controllers/user-controller/user-controller');
 const { darLike, darUnLike, isLiked, likesByRecipeId } = require('../controllers/like-controller/like-controller');
 
 user.route('/')
@@ -16,6 +16,8 @@ user.put('/editusuario/',userExtractor,editarPerfil);
 user.post('/follow/', seguirUsuario);
 user.post('/follow/check/', verificarSeguidor);
 user.post('/unfollow/', dejarDeSeguir);
+
+user.get('/info/:id', obtenerInformacionUsuario);
 
 // Likes
 user.post('/receta/like/', darLike);
