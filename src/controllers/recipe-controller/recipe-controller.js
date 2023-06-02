@@ -296,14 +296,19 @@ const getPopularRecipes = async (req, res) => {
 const getRecipeById = async (req, res, next) => {
   const id = req.params.id;
   try {
-    await pool
-      .query(`select * from recetas where id = ${id}`)
-      .then(results => res.status(200).json(results.rows[0]))
-      .catch(err => next(err))
+    const { rows: [recipe] } = await pool.query('SELECT * FROM recetas WHERE id = $1', [id]);
+    const { rows: imagenes } = await pool.query('SELECT * FROM recetas_imagenes WHERE receta_id = $1', [id]);
+
+    if (recipe) {
+      recipe.imagenes = imagenes.map(image => image.imagen_url);
+      res.status(200).json(recipe);
+    } else {
+      res.status(404).json({ error: 'Receta no encontrada' });
+    }
   } catch (error) {
     next(error);
   }
-}
+};
 
 const getStepsByRecipeId = async (req, res, next) => {
   const id = req.params.id;
@@ -386,18 +391,20 @@ const search = async (req, res, next) => {
   const { palabraclave } = req.body;
   try {
     await pool
-      .query(`SELECT distinct recetas.usuario_id,recetas.id,recetas.nombre,recetas.descripcion,usuarios.username 
-            FROM recetas 
-            JOIN recetas_categorias rc on rc.receta_id = recetas.id 
-            JOIN categorias on categorias.id = rc.categoria_id 
-            JOIN ingredientes on ingredientes.receta_id = recetas.id
-            JOIN usuarios on usuarios.id = recetas.usuario_id
-            WHERE recetas.nombre ILIKE $1 
-            OR recetas.descripcion ILIKE $1 
-            OR ingredientes.nombre ILIKE $1 
-            OR categorias.nombre ILIKE $1`, ['%' + palabraclave + '%'])
+      .query(`SELECT DISTINCT recetas.*, usuarios.username,
+          (SELECT COUNT(*) FROM likes WHERE likes.receta_id = recetas.id) AS likes
+        FROM recetas 
+        JOIN recetas_categorias rc ON rc.receta_id = recetas.id 
+        JOIN categorias ON categorias.id = rc.categoria_id 
+        JOIN ingredientes ON ingredientes.receta_id = recetas.id
+        JOIN usuarios ON usuarios.id = recetas.usuario_id
+        WHERE recetas.nombre ILIKE $1 
+        OR recetas.descripcion ILIKE $1 
+        OR ingredientes.nombre ILIKE $1 
+        OR categorias.nombre ILIKE $1;`, ['%' + palabraclave + '%'])
       .then(response => {
         if (response.rows.length > 0) {
+          console.log(response.rows);
           res.status(200).json(response.rows)
         }
         else {
