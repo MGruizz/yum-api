@@ -175,11 +175,11 @@ const crearNuevaReceta = async (req, res, next) => {
 };
 
 
-const eliminarReceta = (req, res) => {
+const eliminarReceta = (req, res, next) => {
   const { id } = req.params;
   try {
     pool
-      .query('DELETE FROM recetas WHERE id = $1 RETURNING nombrereceta', [id])
+      .query('UPDATE recetas SET deleted = true WHERE id = $1 RETURNING nombre', [id])
       .then(response => {
         console.log(response.rows)
         if (response.rows.length > 0) {
@@ -189,7 +189,7 @@ const eliminarReceta = (req, res) => {
           res.status(401).json({ res: 'No se encuentra la receta' })
         }
       })
-      .catch(err => res.status(401).json({ Error: err.message }))
+      .catch(err => res.status(401).json({ Error: err.message }));
   } catch (e) {
     next(e);
   }
@@ -226,7 +226,7 @@ const editarReceta = (req, res) => {
                 .catch(err => {
                   console.log(err.message)
                 })
-              res.status(200).json({ Res: 'Receta actualizado exitosamente', Receta: response.rows[0] })
+              res.status(200).json({ Res: 'Receta actualizada exitosamente', Receta: response.rows[0] })
             })
             .catch(err => res.status(401).json({ Error: err.message }))
         }
@@ -352,7 +352,7 @@ const getRecipesFullByUserId = async (req, res, next) => {
     SELECT recetas.id, recetas.descripcion, recetas.usuario_id, recetas.created_at, recetas.updated_at, recetas.deleted, recetas.nombre, recetas.likes, recetas.visitas, recetas_imagenes.imagen_url
     FROM recetas
     LEFT JOIN recetas_imagenes ON recetas.id = recetas_imagenes.receta_id
-    WHERE recetas.usuario_id = ${req.params.id};
+    WHERE recetas.usuario_id = ${req.params.id} AND deleted = false;
     `);
 
     const recipes = {};

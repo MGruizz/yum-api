@@ -22,7 +22,7 @@ recipes.route('/searchByCategory/:palabraclave')
     .get(searchByCategory)
 
 // Gestion recetas
-recipes.delete('/eliminarreceta/:id',userExtractor ,eliminarReceta)
+recipes.put('/eliminarreceta/:id', eliminarReceta)
 recipes.put('/editreceta/',userExtractor ,editarReceta)
 recipes.get('/buscarRecetas/:palabraclave',buscarReceta)
 recipes.get('/likes/', likesByRecipeId); // Obtener cantidad de likes
