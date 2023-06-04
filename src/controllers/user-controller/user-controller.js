@@ -198,11 +198,11 @@ const dejarDeSeguir = async (req, res, next) => {
 const obtenerInformacionUsuario = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const seguidores = await pool
+        const seguidoresCount = await pool
             .query('SELECT COUNT(id_usuario_seguidor) FROM seguidores WHERE id_usuario_seguido = $1',
                 [id]);
 
-        const seguidos = await pool
+        const seguidosCount = await pool
             .query('SELECT COUNT(id_usuario_seguido) FROM seguidores WHERE id_usuario_seguidor = $1',
                 [id]);
 
@@ -210,9 +210,23 @@ const obtenerInformacionUsuario = async (req, res, next) => {
             .query('SELECT COUNT(id) FROM recetas WHERE recetas.usuario_id = $1',
                 [id]);
 
+        const seguidoresList = await pool
+            .query('SELECT usuarios.id, usuarios.username FROM usuarios INNER JOIN seguidores ON usuarios.id = seguidores.id_usuario_seguidor WHERE seguidores.id_usuario_seguido = $1', 
+                [id]);
+
+        const seguidosList = await pool
+            .query('SELECT usuarios.id, usuarios.username FROM usuarios INNER JOIN seguidores ON usuarios.id = seguidores.id_usuario_seguido WHERE seguidores.id_usuario_seguidor = $1', 
+                [id]);
+
         res.status(200).send({
-            seguidores: seguidores.rows[0].count,
-            seguidos: seguidos.rows[0].count,
+            seguidores: {
+                count: seguidoresCount.rows[0].count,
+                list: seguidoresList.rows
+            },
+            seguidos: {
+                count: seguidosCount.rows[0].count,
+                list: seguidosList.rows
+            },
             publicaciones: publicaciones.rows[0].count
         })
     }
