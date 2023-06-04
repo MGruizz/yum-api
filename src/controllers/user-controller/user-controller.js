@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
 const bcryptjs = require("bcryptjs");
+const { uploadToAzure } = require('../../Services/storage');
 
 
 const getUsersById = (req, res, next) => {
@@ -92,104 +93,122 @@ const registrarUsuario = async (req, res, next) => {
 }
 
 const editarPerfil = async (req, res, next) => {
-    let {nombreUsuario, descripcion } = req.body;
-    let  idUsuario  = req.id
-    // if(fotoPerfil == null || fotoPerfil == ''){
-    //     fotoPerfil = 'https://i1.sndcdn.com/avatars-000416471418-8ll5py-t240x240.jpg';
-    // }
+    let { nombreUsuario, descripcion, fotoBase64 } = req.body;
+    let idUsuario = req.id;
+
+    const client = await pool.connect();
+
     try {
-        await pool
-            .query('UPDATE usuarios SET username = $1, descripcion = $2 where id = $3 RETURNING *', [nombreUsuario, descripcion, idUsuario])
-            .then(response => {
-                const updatedUser = response.rows[0];
 
-                const userForToken = {
-                    username: updatedUser.username,
-                    id: updatedUser.id,
-                    email: updatedUser.email,
-                    descripcion: updatedUser.descripcion,
-                    is_admin: updatedUser.is_admin,
-                }
+        await client.query('BEGIN');
+        let values;
 
-                const newToken = jwt.sign(userForToken, process.env.SECRET);
+        const updateQuery = `
+            UPDATE usuarios
+            SET username = $1,
+                descripcion = $2
+                ${fotoBase64 ? ', foto_perfil = $4' : ''}
+            WHERE id = $3
+            RETURNING *;
+        `;
 
-                res.status(200).json({ token: newToken, user: userForToken });
-            })
-            .catch(err => {
-                console.log(err.message );
-                res.status(401).json({ Error: err.message })
-            })
+        if (fotoBase64) {
+            console.log("hola")
+            const fotoPerfilUrl = await uploadToAzure(fotoBase64, 'profile_image_' + nombreUsuario);
+            values = [nombreUsuario, descripcion, idUsuario, fotoPerfilUrl]
+        } else {
+            values = [nombreUsuario, descripcion, idUsuario];
+        }
+
+        const response = await client.query(updateQuery, values);
+        const updatedUser = response.rows[0];
+
+        const userForToken = {
+            username: updatedUser.username,
+            id: updatedUser.id,
+            email: updatedUser.email,
+            descripcion: updatedUser.descripcion,
+            is_admin: updatedUser.is_admin
+        };
+
+        const newToken = jwt.sign(userForToken, process.env.SECRET);
+
+        await client.query('COMMIT');
+
+        res.status(200).json({ token: newToken, user: userForToken });
+    } catch (e) {
+        await client.query('ROLLBACK');
+        console.log(e.message);
+        res.status(401).json({ Error: e.message });
+    } finally {
+        client.release();
     }
-    catch (e) {
-        next(e);
-    }
-}
+};
 
 const seguirUsuario = async (req, res, next) => {
-    const {id_usuario_seguido, id_usuario_seguidor} = req.body;
-    try{
+    const { id_usuario_seguido, id_usuario_seguidor } = req.body;
+    try {
         await pool
-            .query('INSERT INTO seguidores (id_usuario_seguido, id_usuario_seguidor) VALUES ($1, $2)', 
-            [id_usuario_seguido, id_usuario_seguidor])
-            .then(results => res.status(200).send({res:'Usuario seguido con éxito'}))
-            .catch(err => res.status(401).json({Error: err.message}))
+            .query('INSERT INTO seguidores (id_usuario_seguido, id_usuario_seguidor) VALUES ($1, $2)',
+                [id_usuario_seguido, id_usuario_seguidor])
+            .then(results => res.status(200).send({ res: 'Usuario seguido con éxito' }))
+            .catch(err => res.status(401).json({ Error: err.message }))
     }
-    catch(err){
-        console.log("No se que pasa")
+    catch (err) {
         next(e);
     }
 }
 
-const verificarSeguidor = async(req, res, next) => {
-    const {id_usuario_seguido, id_usuario_seguidor} = req.body;
-    try{
+const verificarSeguidor = async (req, res, next) => {
+    const { id_usuario_seguido, id_usuario_seguidor } = req.body;
+    try {
         await pool
-            .query('SELECT * FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2', 
-            [id_usuario_seguido, id_usuario_seguidor])
+            .query('SELECT * FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2',
+                [id_usuario_seguido, id_usuario_seguidor])
             .then(results => {
-                if(results.rowCount > 0){
-                    res.status(200).json({isFollowing: true});
-                }else{
-                    res.status(200).json({isFollowing: false});
+                if (results.rowCount > 0) {
+                    res.status(200).json({ isFollowing: true });
+                } else {
+                    res.status(200).json({ isFollowing: false });
                 }
             })
-            .catch(err => res.status(401).json({Error: err.message}))
+            .catch(err => res.status(401).json({ Error: err.message }))
     }
-    catch(err){
+    catch (err) {
         next(e);
     }
 }
 
-const dejarDeSeguir = async(req, res, next) => {
-    const {id_usuario_seguido, id_usuario_seguidor} = req.body;
-    
-    try{
+const dejarDeSeguir = async (req, res, next) => {
+    const { id_usuario_seguido, id_usuario_seguidor } = req.body;
+
+    try {
         await pool
-            .query('DELETE FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2', 
-            [id_usuario_seguido, id_usuario_seguidor])
-            .then(results => res.status(200).send({res:'Usuario seguido con éxito'}))
-            .catch(err => res.status(401).json({Error: err.message}))
+            .query('DELETE FROM seguidores WHERE id_usuario_seguido = $1 AND id_usuario_seguidor = $2',
+                [id_usuario_seguido, id_usuario_seguidor])
+            .then(results => res.status(200).send({ res: 'Usuario seguido con éxito' }))
+            .catch(err => res.status(401).json({ Error: err.message }))
     }
-    catch(err){
-        
+    catch (err) {
+
         next(e);
     }
 }
 
 const obtenerInformacionUsuario = async (req, res, next) => {
     const { id } = req.params;
-    try{
+    try {
         const seguidores = await pool
-            .query('SELECT COUNT(id_usuario_seguidor) FROM seguidores WHERE id_usuario_seguido = $1', 
-            [id]);
+            .query('SELECT COUNT(id_usuario_seguidor) FROM seguidores WHERE id_usuario_seguido = $1',
+                [id]);
 
         const seguidos = await pool
-            .query('SELECT COUNT(id_usuario_seguido) FROM seguidores WHERE id_usuario_seguidor = $1', 
-            [id]);
+            .query('SELECT COUNT(id_usuario_seguido) FROM seguidores WHERE id_usuario_seguidor = $1',
+                [id]);
 
         const publicaciones = await pool
-            .query('SELECT COUNT(id) FROM recetas WHERE recetas.usuario_id = $1', 
-            [id]);    
+            .query('SELECT COUNT(id) FROM recetas WHERE recetas.usuario_id = $1',
+                [id]);
 
         res.status(200).send({
             seguidores: seguidores.rows[0].count,
@@ -197,9 +216,9 @@ const obtenerInformacionUsuario = async (req, res, next) => {
             publicaciones: publicaciones.rows[0].count
         })
     }
-    catch(err){
+    catch (err) {
         console.log(err)
-        res.status(500).json({Error: err.message})
+        res.status(500).json({ Error: err.message })
     }
 }
 
