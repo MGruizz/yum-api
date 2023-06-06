@@ -195,46 +195,54 @@ const eliminarReceta = (req, res, next) => {
   }
 }
 
+// const editarReceta = (req, res) => {
+//   const { idReceta, nombreReceta, descripcionReceta, ingredientes, pasosReceta, tags, imagenes } = req.body;
+//   try {
+//     pool
+//       .query('SELECT * FROM recetas WHERE idreceta = $1', [idReceta])
+//       .then(response => {
+//         if (response.rows.length > 0) {
+//           pool
+//             .query(`UPDATE recetas SET nombrereceta = $1,descripcionreceta = $2,ingredientes = $3,pasosreceta = $4,imagenes = $5
+//                                 WHERE idreceta = $6`, [nombreReceta, descripcionReceta, ingredientes, pasosReceta, imagenes, idReceta])
+//             .then(response => {
+
+
+//               pool
+//                 .query(`DELETE FROM tag_receta WHERE idreceta = $1`, [idReceta])
+//                 .then(results => {
+//                   for (let i in tags) {
+//                     pool
+//                       .query(`
+//                                             INSERT INTO tag_receta(idreceta,idtag) VALUES($1,$2)`, [idReceta, tags[i].idTag])
+//                       .then(results => {
+//                         console.log(`tag ${i}: ${tags[i]} insertado a la receta`);
+//                       })
+//                       .catch(err => {
+//                         console.log(err.message)
+//                       })
+//                   }
+//                 })
+//                 .catch(err => {
+//                   console.log(err.message)
+//                 })
+//               res.status(200).json({ Res: 'Receta actualizada exitosamente', Receta: response.rows[0] })
+//             })
+//             .catch(err => res.status(401).json({ Error: err.message }))
+//         }
+//         else {
+//           res.status(401).json({ Error: 'La receta buscada no existe' });
+//         }
+//       })
+//       .catch(err => res.status(401).json({ Error: err.message }))
+//   } catch (e) {
+//     next(e);
+//   }
+// }
 const editarReceta = (req, res) => {
-  const { idReceta, nombreReceta, descripcionReceta, ingredientes, pasosReceta, tags, imagenes } = req.body;
+  //const { idReceta, nombreReceta, descripcionReceta, ingredientes, pasosReceta, tags, imagenes } = req.body;
   try {
-    pool
-      .query('SELECT * FROM recetas WHERE idreceta = $1', [idReceta])
-      .then(response => {
-        if (response.rows.length > 0) {
-          pool
-            .query(`UPDATE recetas SET nombrereceta = $1,descripcionreceta = $2,ingredientes = $3,pasosreceta = $4,imagenes = $5
-                                WHERE idreceta = $6`, [nombreReceta, descripcionReceta, ingredientes, pasosReceta, imagenes, idReceta])
-            .then(response => {
-
-
-              pool
-                .query(`DELETE FROM tag_receta WHERE idreceta = $1`, [idReceta])
-                .then(results => {
-                  for (let i in tags) {
-                    pool
-                      .query(`
-                                            INSERT INTO tag_receta(idreceta,idtag) VALUES($1,$2)`, [idReceta, tags[i].idTag])
-                      .then(results => {
-                        console.log(`tag ${i}: ${tags[i]} insertado a la receta`);
-                      })
-                      .catch(err => {
-                        console.log(err.message)
-                      })
-                  }
-                })
-                .catch(err => {
-                  console.log(err.message)
-                })
-              res.status(200).json({ Res: 'Receta actualizada exitosamente', Receta: response.rows[0] })
-            })
-            .catch(err => res.status(401).json({ Error: err.message }))
-        }
-        else {
-          res.status(401).json({ Error: 'La receta buscada no existe' });
-        }
-      })
-      .catch(err => res.status(401).json({ Error: err.message }))
+    console.log(req.body);
   } catch (e) {
     next(e);
   }
