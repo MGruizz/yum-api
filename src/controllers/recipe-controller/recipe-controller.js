@@ -394,14 +394,15 @@ const search = async (req, res, next) => {
       .query(`SELECT DISTINCT recetas.*, usuarios.username,
           (SELECT COUNT(*) FROM likes WHERE likes.receta_id = recetas.id) AS likes
         FROM recetas 
-        JOIN recetas_categorias rc ON rc.receta_id = recetas.id 
-        JOIN categorias ON categorias.id = rc.categoria_id 
-        JOIN ingredientes ON ingredientes.receta_id = recetas.id
+        LEFT JOIN recetas_categorias rc ON rc.receta_id = recetas.id 
+        LEFT JOIN categorias ON categorias.id = rc.categoria_id 
+        LEFT JOIN ingredientes ON ingredientes.receta_id = recetas.id
         JOIN usuarios ON usuarios.id = recetas.usuario_id
-        WHERE recetas.nombre ILIKE $1 
+        WHERE recetas.delted = false AND
+        (recetas.nombre ILIKE $1 
         OR recetas.descripcion ILIKE $1 
         OR ingredientes.nombre ILIKE $1 
-        OR categorias.nombre ILIKE $1;`, ['%' + palabraclave + '%'])
+        OR categorias.nombre ILIKE $1);`, ['%' + palabraclave + '%'])
       .then(response => {
         if (response.rows.length > 0) {
           console.log(response.rows);
