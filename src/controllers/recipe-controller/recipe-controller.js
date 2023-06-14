@@ -334,10 +334,11 @@ const getPopularRecipes = async (req, res) => {
 
   try {
     const popularRecipesResult = await pool.query(
-      `SELECT id, nombre, descripcion, visitas, likes 
+      `SELECT id, nombre, descripcion, visitas,
+        (SELECT COUNT(*) FROM likes WHERE likes.receta_id = recetas.id) AS likes 
       FROM recetas 
-      WHERE EXTRACT(MONTH FROM created_at) = $1 AND EXTRACT(YEAR FROM created_at) = $2 
-      ORDER BY visitas DESC LIMIT 3`,
+      WHERE EXTRACT(MONTH FROM created_at) = $1 AND EXTRACT(YEAR FROM created_at) = $2
+      ORDER BY likes DESC LIMIT 3`,
       [currentMonth, currentYear]
     );
 
