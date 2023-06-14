@@ -464,7 +464,7 @@ const search = async (req, res, next) => {
         LEFT JOIN categorias ON categorias.id = rc.categoria_id 
         LEFT JOIN ingredientes ON ingredientes.receta_id = recetas.id
         JOIN usuarios ON usuarios.id = recetas.usuario_id
-        WHERE recetas.delted = false AND
+        WHERE recetas.deleted = false AND
         (recetas.nombre ILIKE $1 
         OR recetas.descripcion ILIKE $1 
         OR ingredientes.nombre ILIKE $1 
