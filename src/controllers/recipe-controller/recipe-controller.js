@@ -217,87 +217,87 @@ const editarReceta = async (req, res) => {
       } catch (error) {
         console.log(err.message);
       }
-      // Eliminar categorias anteriores
-      try {
-        pool.query(
-          `DELETE FROM public.recetas_categorias WHERE receta_id = $1`,
-          [idReceta]
-        );
-        console.log(`Categorias antiguas eliminada exitosamente`);
-      } catch (error) {
-        console.log(err.message);
-      }
-       // Eliminar Pasos anteriores
-      try {
-        pool.query(`DELETE FROM public.pasos WHERE receta_id = $1`, [idReceta]);
-        console.log(`Pasos antiguos eliminados exitosamente`);
-      } catch (error) {
-        console.log(err.message);
-      }
-      // Eliminar Ingredientes anteriores
-      try {
-        pool.query(`DELETE FROM public.ingredientes WHERE receta_id = $1`, [
-          idReceta,
-        ]);
-        console.log(`Ingredientes antiguos eliminados exitosamente`);
-      } catch (error) {
-        console.log(err.message);
-      }
-      console.log(`paso fase de eliminacion`)
-      // Insertar nuevos pasos
-      for (let i in pasosReceta) {
-        try {
-          const pasoResult = await pool.query(
-            `INSERT INTO pasos (receta_id, numero, descripcion) VALUES ($1, $2, $3) RETURNING id`,
-            [idReceta, pasosReceta[i].numero, pasosReceta[i].descripcion]
-          );
+      // // Eliminar categorias anteriores
+      // try {
+      //   pool.query(
+      //     `DELETE FROM public.recetas_categorias WHERE receta_id = $1`,
+      //     [idReceta]
+      //   );
+      //   console.log(`Categorias antiguas eliminada exitosamente`);
+      // } catch (error) {
+      //   console.log(err.message);
+      // }
+      //  // Eliminar Pasos anteriores
+      // try {
+      //   pool.query(`DELETE FROM public.pasos WHERE receta_id = $1`, [idReceta]);
+      //   console.log(`Pasos antiguos eliminados exitosamente`);
+      // } catch (error) {
+      //   console.log(err.message);
+      // }
+      // // Eliminar Ingredientes anteriores
+      // try {
+      //   pool.query(`DELETE FROM public.ingredientes WHERE receta_id = $1`, [
+      //     idReceta,
+      //   ]);
+      //   console.log(`Ingredientes antiguos eliminados exitosamente`);
+      // } catch (error) {
+      //   console.log(err.message);
+      // }
+      // console.log(`paso fase de eliminacion`)
+      // // Insertar nuevos pasos
+      // for (let i in pasosReceta) {
+      //   try {
+      //     const pasoResult = await pool.query(
+      //       `INSERT INTO pasos (receta_id, numero, descripcion) VALUES ($1, $2, $3) RETURNING id`,
+      //       [idReceta, pasosReceta[i].numero, pasosReceta[i].descripcion]
+      //     );
 
-          console.log(`Paso ${i} insertado a la receta`);
-        } catch (err) {
-          console.log(err.message);
-        }
-      }
+      //     console.log(`Paso ${i} insertado a la receta`);
+      //   } catch (err) {
+      //     console.log(err.message);
+      //   }
+      // }
 
-      // Insertar nuevos ingredientes
-      for (let i in ingredientesReceta) {
-        try {
-          const ingredienteResult = await pool.query(
-            `INSERT INTO ingredientes (receta_id ,nombre) VALUES ($1,$2) RETURNING id`,
-            [idReceta, ingredientesReceta[i]]
-          );
-          console.log(
-            `Ingrediente ${ingredientesReceta[i]} insertado a la receta`
-          );
-        } catch (err) {
-          console.log(err.message);
-        }
-      }
-      // Insertar nuevas categorías
-      for (let i in categoriasReceta) {
-        try {
-          const categoriaResult = await pool.query(
-            `SELECT id FROM categorias WHERE id = $1`,
-            [categoriasReceta[i]]
-          );
+      // // Insertar nuevos ingredientes
+      // for (let i in ingredientesReceta) {
+      //   try {
+      //     const ingredienteResult = await pool.query(
+      //       `INSERT INTO ingredientes (receta_id ,nombre) VALUES ($1,$2) RETURNING id`,
+      //       [idReceta, ingredientesReceta[i]]
+      //     );
+      //     console.log(
+      //       `Ingrediente ${ingredientesReceta[i]} insertado a la receta`
+      //     );
+      //   } catch (err) {
+      //     console.log(err.message);
+      //   }
+      // }
+      // // Insertar nuevas categorías
+      // for (let i in categoriasReceta) {
+      //   try {
+      //     const categoriaResult = await pool.query(
+      //       `SELECT id FROM categorias WHERE id = $1`,
+      //       [categoriasReceta[i]]
+      //     );
 
-          if (categoriaResult.rowCount > 0) {
-            const categoriaId = categoriaResult.rows[0].id;
+      //     if (categoriaResult.rowCount > 0) {
+      //       const categoriaId = categoriaResult.rows[0].id;
 
-            await pool.query(
-              `INSERT INTO recetas_categorias (receta_id, categoria_id) VALUES ($1, $2)`,
-              [idReceta, categoriaId]
-            );
+      //       await pool.query(
+      //         `INSERT INTO recetas_categorias (receta_id, categoria_id) VALUES ($1, $2)`,
+      //         [idReceta, categoriaId]
+      //       );
 
-            console.log(
-              `Categoría ${categoriasReceta[i]} insertada a la receta`
-            );
-          } else {
-            console.log(`Categoría ${categoriasReceta[i]} no encontrada`);
-          }
-        } catch (err) {
-          console.log(err.message);
-        }
-      }
+      //       console.log(
+      //         `Categoría ${categoriasReceta[i]} insertada a la receta`
+      //       );
+      //     } else {
+      //       console.log(`Categoría ${categoriasReceta[i]} no encontrada`);
+      //     }
+      //   } catch (err) {
+      //     console.log(err.message);
+      //   }
+      // }
       res.status(201).json({ res: "Inserción exitosa" });
   } catch (e) {
     next(e);
