@@ -344,6 +344,14 @@ const getPopularRecipes = async (req, res) => {
 
     let popularRecipes = popularRecipesResult.rows;
 
+    for (let i = 0; i < popularRecipes.length; i++) {
+      const imageResult = await pool.query(
+        `SELECT imagen_url FROM recetas_imagenes WHERE receta_id = $1 LIMIT 1`,
+        [popularRecipes[i].id]
+      );
+      popularRecipes[i].imagen = imageResult.rows[0] ? imageResult.rows[0].imagen_url : null;
+    }
+
     if (popularRecipes.length < 3) {
       const allTimePopularRecipesResult = await pool.query(
         `SELECT id, nombre, descripcion, visitas, likes 
@@ -352,9 +360,21 @@ const getPopularRecipes = async (req, res) => {
         ORDER BY visitas DESC LIMIT ${3 - popularRecipes.length}`
       );
 
-      popularRecipes = [...popularRecipes, ...allTimePopularRecipesResult.rows];
+      const allTimePopularRecipes = allTimePopularRecipesResult.rows;
+      
+      for (let i = 0; i < allTimePopularRecipes.length; i++) {
+        const imageResult = await pool.query(
+          `SELECT imagen_url FROM recetas_imagenes WHERE receta_id = $1 LIMIT 1`,
+          [allTimePopularRecipes[i].id]
+        );
+        allTimePopularRecipes[i].imagen = imageResult.rows[0] ? imageResult.rows[0].imagen_url : null;
+      }
+
+      popularRecipes = [...popularRecipes, ...allTimePopularRecipes];
     }
+
     res.status(200).json({ popularRecipes });
+
   } catch (err) {
     res.status(500).json({ message: 'Error al obtener las recetas populares' });
   }
