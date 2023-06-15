@@ -207,7 +207,7 @@ const obtenerInformacionUsuario = async (req, res, next) => {
                 [id]);
 
         const publicaciones = await pool
-            .query('SELECT COUNT(id) FROM recetas WHERE recetas.usuario_id = $1',
+            .query('SELECT COUNT(id) FROM recetas WHERE recetas.usuario_id = $1 and recetas.deleted is false',
                 [id]);
 
         const seguidoresList = await pool
