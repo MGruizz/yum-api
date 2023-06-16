@@ -103,7 +103,7 @@ const editarTag = (req, res) => {
 const getPopularTags = async (req, res) => {
     try {
         const popularCategoriesResult = await pool.query(
-            `SELECT categorias.id, categorias.nombre, count(*) as recetas_count
+            `SELECT categorias.id, categorias.nombre, count(*) as recetas_count, categorias.imagen
             FROM categorias 
             JOIN recetas_categorias ON categorias.id = recetas_categorias.categoria_id
             GROUP BY categorias.id, categorias.nombre
