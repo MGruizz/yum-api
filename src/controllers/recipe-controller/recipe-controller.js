@@ -1,5 +1,5 @@
  const pool = require('../../configs/db.config');
-const {uploadToAzure} = require('../../Services/storage');
+const { uploadToAzure } = require('../../Services/storage');
 
 const getAllRecipes = async (req, res, next) => {
   try {
@@ -490,8 +490,20 @@ const search = async (req, res, next) => {
         OR recetas.descripcion ILIKE $1 
         OR ingredientes.nombre ILIKE $1 
         OR categorias.nombre ILIKE $1);`, ['%' + palabraclave + '%'])
-      .then(response => {
+      .then(async response => {
         if (response.rows.length > 0) {
+          for (let i = 0; i < response.rows.length; i++) {
+            const imagenesResult = await pool.query(
+              `SELECT imagen_url FROM recetas_imagenes WHERE receta_id = $1`,
+              [response.rows[i].id]
+            );
+          
+            response.rows[i].imagenes = [];
+          
+            for(let j = 0; j < imagenesResult.rows.length; j++){
+              response.rows[i].imagenes.push(imagenesResult.rows[j].imagen_url);
+            }
+          }
           console.log(response.rows);
           res.status(200).json(response.rows)
         }
